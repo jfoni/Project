@@ -1,0 +1,121 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Random;
+
+public class Code extends JFrame {
+    private String[] quotes = {
+            "Believe in yourself and all that you are.",
+            "Push yourself, because no one else is going to do it for you.",
+            "Dream it. Wish it. Do it.",
+            "Success doesn’t just find you. You have to go out and get it.",
+            "The harder you work for something, the greater you’ll feel when you achieve it.",
+            "Never give up."
+    };
+
+    private JLabel quoteLabel;
+    private JButton newQuoteButton;
+    private JPanel backgroundPanel;
+
+    public Code() {
+        setTitle("🌿 Soulful Motivation 🌿");
+        setSize(800, 450);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        backgroundPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                GradientPaint gradient = new GradientPaint(
+                        0, 0, new Color(255, 239, 213),
+                        getWidth(), getHeight(), new Color(200, 230, 201)
+                );
+                g2d.setPaint(gradient);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
+        };
+        backgroundPanel.setLayout(new BorderLayout());
+        add(backgroundPanel);
+
+        quoteLabel = new JLabel(getRandomQuote(), SwingConstants.CENTER);
+        quoteLabel.setFont(new Font("Georgia", Font.ITALIC, 24));
+        quoteLabel.setForeground(new Color(40, 40, 40));
+
+        JPanel quotePanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.85f));
+                g2d.setColor(Color.WHITE);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+                g2d.dispose();
+            }
+        };
+        quotePanel.setOpaque(false);
+        quotePanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
+        quotePanel.setLayout(new BorderLayout());
+        quotePanel.add(quoteLabel, BorderLayout.CENTER);
+
+        backgroundPanel.add(quotePanel, BorderLayout.CENTER);
+
+        newQuoteButton = new JButton("✨ Inspire Me ✨");
+        newQuoteButton.setFont(new Font("SansSerif", Font.BOLD, 16));
+        newQuoteButton.setBackground(new Color(116, 170, 156));
+        newQuoteButton.setForeground(Color.WHITE);
+        newQuoteButton.setFocusPainted(false);
+        newQuoteButton.setBorder(BorderFactory.createEmptyBorder(12, 25, 12, 25));
+        newQuoteButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        newQuoteButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                newQuoteButton.setBackground(new Color(96, 150, 136));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                newQuoteButton.setBackground(new Color(116, 170, 156));
+            }
+        });
+
+        newQuoteButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                fadeInQuote(getRandomQuote());
+            }
+        });
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(newQuoteButton);
+        backgroundPanel.add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    private String getRandomQuote() {
+        Random rand = new Random();
+        int index = rand.nextInt(quotes.length);
+        return quotes[index];
+    }
+
+    private void fadeInQuote(String newText) {
+        Timer timer = new Timer(40, null);
+        final float[] alpha = {0f};
+        quoteLabel.setText(newText);
+        quoteLabel.setForeground(new Color(40, 40, 40, 0));
+
+        timer.addActionListener(e -> {
+            alpha[0] += 0.05f;
+            if (alpha[0] >= 1f) {
+                alpha[0] = 1f;
+                ((Timer) e.getSource()).stop();
+            }
+            quoteLabel.setForeground(new Color(40, 40, 40, (int) (alpha[0] * 255)));
+        });
+        timer.start();
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            new Code().setVisible(true);
+        });
+    }
+}
